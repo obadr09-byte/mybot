@@ -29,10 +29,13 @@ jobs:
           pip install -r requirements.txt
 
       # 4️⃣ تشغيل البوت
-      - name: Run Telegram Bot
-        env:
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+# 4️⃣ إنشاء ملف .env وتشغيل البوت
+      - name: Create .env file and Run
         run: |
+          # إنشاء ملف .env ووضع القيم بالأسماء القصيرة التي يطلبها الكود
+          echo "TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
+          echo "URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "KEY=${{ secrets.SUPABASE_KEY }}" >> .env
+          
+          # تشغيل البوت
           python telegram_bot.py
