@@ -1,41 +1,44 @@
 name: Run Telegram Bot
 
-# متى يعمل الـ workflow
 on:
   push:
     branches:
       - main
-  workflow_dispatch:  # ده يديك خيار تشغيله يدويًا من GitHub
+  workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ نسخ الكود من الـ repo
+      # 1️⃣ نسخ الكود
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2️⃣ تثبيت بايثون
+      # 2️⃣ تثبيت مكتبات النظام الضرورية لـ WeasyPrint (مهم جداً)
+      - name: Install System Dependencies (WeasyPrint)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-cffi python3-brotli libpango-1.0-0 libpangoft2-1.0-0
+
+      # 3️⃣ تثبيت بايثون
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
 
-      # 3️⃣ تثبيت المكتبات المطلوبة
+      # 4️⃣ تثبيت مكتبات بايثون
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 4️⃣ تشغيل البوت
-# 4️⃣ إنشاء ملف .env وتشغيل البوت
+      # 5️⃣ إنشاء ملف .env وتشغيل البوت
       - name: Create .env file and Run
         run: |
-          # إنشاء ملف .env ووضع القيم بالأسماء القصيرة التي يطلبها الكود
-          echo "TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
-          echo "URL=${{ secrets.SUPABASE_URL }}" >> .env
-          echo "KEY=${{ secrets.SUPABASE_KEY }}" >> .env
+          # استخدام القيم المخزنة في Secrets
+          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
           
-          # تشغيل البوت
           python telegram_bot.py
