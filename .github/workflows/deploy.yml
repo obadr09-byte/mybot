@@ -1,32 +1,38 @@
-name: Deploy Telegram Bot to Railway
+name: Run Telegram Bot
 
+# متى يعمل الـ workflow
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
+  workflow_dispatch:  # ده يديك خيار تشغيله يدويًا من GitHub
 
 jobs:
-  deploy:
+  run-bot:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # 1️⃣ نسخ الكود من الـ repo
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Python
+      # 2️⃣ تثبيت بايثون
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
-      - name: Install Railway CLI
+      # 3️⃣ تثبيت المكتبات المطلوبة
+      - name: Install dependencies
         run: |
-          curl -fsSL https://railway.app/install.sh | sh
-          echo 'export PATH="$HOME/.railway/bin:$PATH"' >> $GITHUB_ENV
-          source $GITHUB_ENV
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Install requirements
-        run: pip install -r requirements.txt
-
-      - name: Deploy to Railway
+      # 4️⃣ تشغيل البوت
+      - name: Run Telegram Bot
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up --service=telegram-bot
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: |
+          python telegram_bot.py
