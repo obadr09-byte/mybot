@@ -15,8 +15,8 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2️⃣ تثبيت مكتبات النظام الضرورية لـ WeasyPrint (مهم جداً)
-      - name: Install System Dependencies (WeasyPrint)
+      # 2️⃣ تثبيت مكتبات النظام (مهم لـ WeasyPrint والـ PDF)
+      - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pip python3-cffi python3-brotli libpango-1.0-0 libpangoft2-1.0-0
@@ -27,18 +27,18 @@ jobs:
         with:
           python-version: '3.12'
 
-      # 4️⃣ تثبيت مكتبات بايثون
+      # 4️⃣ تثبيت المكتبات
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 5️⃣ إنشاء ملف .env وتشغيل البوت
-      - name: Create .env file and Run
+      # 5️⃣ تشغيل البوت (تمرير الأسرار مباشرة)
+      - name: Run Telegram Bot
+        env:
+          # هنا نربط أسرار GitHub بمتغيرات البيئة التي ينتظرها الكود
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         run: |
-          # استخدام القيم المخزنة في Secrets
-          echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" >> .env
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
-          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
-          
           python telegram_bot.py
